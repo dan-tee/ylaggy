@@ -3,8 +3,8 @@
 	"GoVersion": "go1.2.1",
 	"Deps": [
 		{
-			"ImportPath": "github.com/aeden/traceroute",
-			"Rev": "dd625634081a5d530c96ff5bbcb7c70b304ff9f7"
+			"ImportPath": "github.com/dan-tee/traceroute",
+			"Rev": "9e70e82df05a5acc581d0551895ed36f9abaf38d"
 		}
 	]
 }

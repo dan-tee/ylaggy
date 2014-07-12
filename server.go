@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/aeden/traceroute"
+	"github.com/dan-tee/traceroute"
 	"io/ioutil"
 	"net/http"
 	"os"

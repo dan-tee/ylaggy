@@ -184,12 +184,14 @@ func Traceroute(dest string, options *TracerouteOptions, c ...chan TracerouteHop
 		// Set up the socket to receive inbound packets
 		recvSocket, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_RAW, syscall.IPPROTO_ICMP)
 		if err != nil {
+			fmt.Errorf("Error opening raw socket: %s", err.Error())
 			return result, err
 		}
 
 		// Set up the socket to send packets out.
 		sendSocket, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
 		if err != nil {
+			fmt.Errorf("Error opening datagram socket: %s", err.Error())
 			return result, err
 		}
 		// This sets the current hop TTL
