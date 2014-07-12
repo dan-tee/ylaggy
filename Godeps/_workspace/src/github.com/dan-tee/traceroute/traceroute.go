@@ -18,7 +18,7 @@ const DEFAULT_PACKET_SIZE = 52
 
 // Return the first non-loopback address as a 4 byte IP address. This address
 // is used for sending packets out.
-func socketAddr() (addr [4]byte, err error) {
+func localAddr() (addr [4]byte, err error) {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
 		return
@@ -167,9 +167,9 @@ func Traceroute(dest string, options *TracerouteOptions, c ...chan TracerouteHop
 	result.Hops = []TracerouteHop{}
 	destAddr, err := destAddr(dest)
 	result.DestinationAddress = destAddr
-	socketAddr, err := socketAddr()
+	localAddr, err := localAddr()
 	if err != nil {
-		return
+		fmt.Errorf("Error opening raw socket: %s", err.Error())
 	}
 
 	timeoutMs := (int64)(options.TimeoutMs())
@@ -202,8 +202,11 @@ func Traceroute(dest string, options *TracerouteOptions, c ...chan TracerouteHop
 		defer syscall.Close(recvSocket)
 		defer syscall.Close(sendSocket)
 
+	    // check https://github.com/linroics/traceroute/commit/5a647c8aae0ec53a2ddbee86d02619886addf605
+		// for reusing the socket
+
 		// Bind to the local socket to listen for ICMP packets
-		syscall.Bind(recvSocket, &syscall.SockaddrInet4{Port: options.Port(), Addr: socketAddr})
+		syscall.Bind(recvSocket, &syscall.SockaddrInet4{Port: options.Port(), Addr: localAddr})
 
 		// Send a single null byte UDP packet
 		syscall.Sendto(sendSocket, []byte{0x0}, 0, &syscall.SockaddrInet4{Port: options.Port(), Addr: destAddr})
