@@ -6,6 +6,7 @@ import (
 	"github.com/aeden/traceroute"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 var (
@@ -22,8 +23,8 @@ func main() {
 	http.HandleFunc("/favicon.ico", serveFavicon)
 	http.HandleFunc("/traceroute", serveTraceRoute)
 
-	fmt.Printf("Server listening on port %d\n", config.Port)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", config.Port), nil)
+	fmt.Printf("Server listening on port %d\n", os.Getenv("PORT"))
+	err := http.ListenAndServe(fmt.Sprintf(":%d", os.Getenv("PORT")), nil)
 	if err != nil {
 		panic(err)
 	}
