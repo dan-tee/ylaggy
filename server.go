@@ -23,8 +23,8 @@ func main() {
 	http.HandleFunc("/favicon.ico", serveFavicon)
 	http.HandleFunc("/traceroute", serveTraceRoute)
 
-	fmt.Printf("Server listening on port %d\n", os.Getenv("PORT"))
-	err := http.ListenAndServe(fmt.Sprintf(":%d", os.Getenv("PORT")), nil)
+	fmt.Println("Server listening on port " + os.Getenv("PORT"))
+	err := http.ListenAndServe(fmt.Sprintf(":" + os.Getenv("PORT")), nil)
 	if err != nil {
 		panic(err)
 	}
