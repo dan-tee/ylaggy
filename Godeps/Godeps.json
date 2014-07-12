@@ -1,0 +1,10 @@
+{
+	"ImportPath": "heroku.com/checkmyinternet",
+	"GoVersion": "go1.2.1",
+	"Deps": [
+		{
+			"ImportPath": "github.com/aeden/traceroute",
+			"Rev": "dd625634081a5d530c96ff5bbcb7c70b304ff9f7"
+		}
+	]
+}
