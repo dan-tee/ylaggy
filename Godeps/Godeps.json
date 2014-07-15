@@ -4,7 +4,7 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/dan-tee/traceroute",
-			"Rev": "c2d9e1b345414fa69c0815365305869abc50c700"
+			"Rev": "28844282c999a5ba378cd7d420bb7ef4b9d7cdab"
 		}
 	]
 }

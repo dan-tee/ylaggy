@@ -38,15 +38,20 @@ func localAddr() (addr [4]byte, err error) {
 
 // Given a host name convert it to a 4 byte IP address.
 func destAddr(dest string) (destAddr [4]byte, err error) {
+	if tcpAddr, err := net.ResolveTCPAddr("tcp4", dest); err == nil {
+		copy(destAddr[:], tcpAddr.IP.To4())
+		return destAddr, nil
+	}
+
 	addrs, err := net.LookupHost(dest)
 	if err != nil {
-		return
+		return destAddr, err
 	}
 	addr := addrs[0]
 
 	ipAddr, err := net.ResolveIPAddr("ip", addr)
 	if err != nil {
-		return
+		return destAddr, err
 	}
 	copy(destAddr[:], ipAddr.IP.To4())
 	return
@@ -167,13 +172,13 @@ func Traceroute(dest string, options *TracerouteOptions, c ...chan TracerouteHop
 	result.Hops = []TracerouteHop{}
 	destAddr, err := destAddr(dest)
 	if err != nil {
-		fmt.Errorf("Error resolving destination %d: %s", destAddr, err.Error())
+		return result, fmt.Errorf("Error resolving destination %d: %s", destAddr, err.Error())
 	}
 
 	result.DestinationAddress = destAddr
 	localAddr, err := localAddr()
 	if err != nil {
-		fmt.Errorf("Error opening raw socket: %s", err.Error())
+		return result, fmt.Errorf("Error opening raw socket: %s", err.Error())
 	}
 
 	timeoutMs := (int64)(options.TimeoutMs())
@@ -188,15 +193,13 @@ func Traceroute(dest string, options *TracerouteOptions, c ...chan TracerouteHop
 		// Set up the socket to receive inbound packets
 		recvSocket, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_RAW, syscall.IPPROTO_ICMP)
 		if err != nil {
-			fmt.Errorf("Error opening raw socket: %s", err.Error())
-			return result, err
+			return result, fmt.Errorf("Error opening raw socket: %s", err.Error())
 		}
 
 		// Set up the socket to send packets out.
 		sendSocket, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
 		if err != nil {
-			fmt.Errorf("Error opening datagram socket: %s", err.Error())
-			return result, err
+			return result, fmt.Errorf("Error opening datagram socket: %s", err.Error())
 		}
 		// This sets the current hop TTL
 		syscall.SetsockoptInt(sendSocket, 0x0, syscall.IP_TTL, ttl)
@@ -247,7 +250,7 @@ func Traceroute(dest string, options *TracerouteOptions, c ...chan TracerouteHop
 				notify(TracerouteHop{Success: false, TTL: ttl}, c)
 				ttl += 1
 				retry = 0
-				return TracerouteResult{}, fmt.Errorf("Error receiving from %d :" + err.Error(), destAddr)
+				return result, fmt.Errorf("Error receiving from %d :" + err.Error(), destAddr)
 			}
 		}
 
