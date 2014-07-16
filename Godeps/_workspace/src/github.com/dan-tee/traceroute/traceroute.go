@@ -174,6 +174,7 @@ func Traceroute(dest string, options *TracerouteOptions, c ...chan TracerouteHop
 	if err != nil {
 		return result, fmt.Errorf("Error resolving destination %d: %s", destAddr, err.Error())
 	}
+	fmt.Printf("Performing traceroute for Destination %d\n", destAddr)
 
 	result.DestinationAddress = destAddr
 	localAddr, err := localAddr()
