@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/dan-tee/traceroute"
 	"io/ioutil"
 	"net/http"
 )
@@ -20,7 +18,7 @@ func main() {
 
 	http.HandleFunc("/", serveIndex)
 	http.HandleFunc("/favicon.ico", serveFavicon)
-	http.HandleFunc("/traceroute", serveTraceRoute)
+	http.HandleFunc("/router_ip", serveRouterIp)
 
 	fmt.Printf("Server listening on port %d\n", config.Port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", config.Port), nil)
@@ -47,22 +45,16 @@ func serveFavicon(res http.ResponseWriter, req *http.Request) {
 	res.Write(favicon)
 }
 
-func serveTraceRoute(res http.ResponseWriter, req *http.Request) {
-	fmt.Printf("Request to traceroute for %s\n", req.RemoteAddr)
-	options := new(traceroute.TracerouteOptions)
-	options.SetTimeoutMs(config.Timeout)
-	options.SetRetries(1)
+func serveRouterIp(res http.ResponseWriter, req *http.Request) {
+	fmt.Printf("Request to router_ip for %s\n", req.RemoteAddr)
 
-	traceRes, err := traceroute.Traceroute(req.RemoteAddr, options)
+	// allow cross domain AJAX requests
+	res.Header().Set("Access-Control-Allow-Origin", "*")
+	res.Header().Set("Content-Type", "application/json")
 
-	if err != nil {
-		panic(err)
+	json, err := JsonMap{"router_ip": req.RemoteAddr}.String(); if err != nil{
+		fmt.Println(err.Error)
 	}
-	json, err := json.Marshal(traceRes)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(traceRes.DestinationAddress)
-	fmt.Printf("%s\n", json)
-	res.Write(json)
+
+	fmt.Fprint(res, json)
 }
