@@ -8,15 +8,18 @@ import (
 
 var (
 	indexHtml []byte
+	bundleJs  []byte
 	favicon   []byte
 	config    = readConfig()
 )
 
 func main() {
 	cacheIndexHtml()
+	cacheBundleJs()
 	cacheFavicon()
 
 	http.HandleFunc("/", serveIndex)
+	http.HandleFunc("/dist/bundle.js", serveBundleJs)
 	http.HandleFunc("/favicon.ico", serveFavicon)
 	http.HandleFunc("/router_ip", serveRouterIp)
 
@@ -31,6 +34,10 @@ func cacheIndexHtml() {
 	indexHtml, _ = ioutil.ReadFile("index.html")
 }
 
+func cacheBundleJs() {
+	bundleJs, _ = ioutil.ReadFile("./dist/bundle.js")
+}
+
 func cacheFavicon() {
 	favicon, _ = ioutil.ReadFile("traffic_light.png")
 }
@@ -38,6 +45,11 @@ func cacheFavicon() {
 func serveIndex(res http.ResponseWriter, req *http.Request) {
 	fmt.Println("Request to Index")
 	res.Write(indexHtml)
+}
+
+func serveBundleJs(res http.ResponseWriter, req *http.Request) {
+	fmt.Println("Request to bundle.js")
+	res.Write(bundleJs)
 }
 
 func serveFavicon(res http.ResponseWriter, req *http.Request) {
