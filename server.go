@@ -67,7 +67,7 @@ func serveRouterIp(res http.ResponseWriter, req *http.Request) {
 
 	var remoteIp string
 	if strings.Contains(req.RemoteAddr, ":") {
-		remoteIp = req.RemoteAddr
+		remoteIp = strings.Split(req.RemoteAddr, ":")[0]
 	} else {
 		remoteIp = req.RemoteAddr
 	}
