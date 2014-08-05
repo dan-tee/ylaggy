@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"io/ioutil"
 	"net/http"
 )
@@ -64,7 +65,14 @@ func serveRouterIp(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	res.Header().Set("Content-Type", "application/json")
 
-	json, err := JsonMap{"router_ip": req.RemoteAddr}.String(); if err != nil{
+	var remoteIp string
+	if strings.Contains(req.RemoteAddr, ":") {
+		remoteIp = req.RemoteAddr
+	} else {
+		remoteIp = req.RemoteAddr
+	}
+
+	json, err := JsonMap{"router_ip": remoteIp }.String(); if err != nil{
 		fmt.Println(err.Error)
 	}
 
